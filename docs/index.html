@@ -1599,7 +1599,7 @@
 
         const assets = release.assets;
         const windows = assets.find(asset => /\.exe$/i.test(asset.name));
-        const linux = assets.find(asset => /linux|\.tar\.gz$/i.test(asset.name));
+        const linux = assets.find(asset => /linux|\.appimage$|\.tar\.gz$/i.test(asset.name));
         const links = { windows, linux };
 
         document.querySelectorAll('[data-platform]').forEach(link => {
