@@ -1,0 +1,9 @@
+# Ambiente local do Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Produtos de compilação e distribuição
+build/
+dist/
+anoto-*-windows-x64.spec

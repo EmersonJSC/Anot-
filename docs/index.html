@@ -691,11 +691,47 @@
       color: var(--text-muted);
     }
 
+    .app-screenshots {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .app-screenshot {
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      background: #111827;
+      box-shadow: 0 25px 60px -20px rgba(0, 0, 0, 0.7);
+    }
+
+    .app-screenshot img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .app-screenshot figcaption {
+      padding: 13px 16px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
     /* Seção Open Source e GitHub */
     .section-oss {
       padding: 75px 0;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 760px) {
+      .app-screenshots {
+        grid-template-columns: 1fr;
+      }
     }
 
     .section-header {
@@ -1056,7 +1092,7 @@
       </ul>
 
       <!-- Link do Git em destaque no header -->
-      <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-github-nav" title="Ver código no GitHub">
+      <a href="https://github.com/EmersonJSC/Anot-" target="_blank" rel="noopener noreferrer" class="btn-github-nav" title="Ver código no GitHub">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
         </svg>
@@ -1133,8 +1169,8 @@
                 </svg>
               </div>
               <div class="btn-text-group">
-                <span class="btn-main-text">Baixar para Linux</span>
-                <span class="btn-sub-text">Compatível com Ubuntu, Debian, Fedora, Arch</span>
+                <span class="btn-main-text">Baixar AppImage para Linux</span>
+                <span class="btn-sub-text">AppImage (recomendado) • .tar.gz disponível</span>
               </div>
             </a>
           </div>
@@ -1143,7 +1179,7 @@
           <div class="download-extra-info">
             <span>💻 100% Gratuito & Open Source</span>
             <span>•</span>
-            <a href="#contribuir">Como rodar pelo código-fonte no Git</a>
+            <span>Pronto para usar, sem instalar pelo código</span>
             <span>•</span>
             <a href="https://github.com/EmersonJSC/Anot-/releases" target="_blank" rel="noopener noreferrer">Ver todas as versões no GitHub &rarr;</a>
           </div>
@@ -1250,11 +1286,22 @@
       <div class="app-preview-wrap">
         <div class="section-header" style="margin-bottom: 30px;">
           <span class="section-tag">Interface do Aplicativo</span>
-          <h2 class="section-title">O Conceito de "Chat Silencioso"</h2>
-          <p class="section-desc">Interface limpa, sem menus poluídos. Você apenas solta o arquivo e lê o resultado.</p>
+          <h2 class="section-title">Simples do início ao fim</h2>
+          <p class="section-desc">Escolha um arquivo, acompanhe o processamento e copie ou abra o texto quando estiver pronto.</p>
         </div>
 
-        <div class="window-mockup">
+        <div class="app-screenshots">
+          <figure class="app-screenshot">
+            <img src="assets/anoto-tela-inicial.png" alt="Tela inicial do anotô com área para arrastar um arquivo de áudio ou vídeo">
+            <figcaption>Arraste um áudio ou vídeo, ou selecione o arquivo pelo botão.</figcaption>
+          </figure>
+          <figure class="app-screenshot">
+            <img src="assets/anoto-transcricao-concluida.png" alt="Tela do anotô mostrando uma transcrição concluída em português">
+            <figcaption>Veja o texto reconhecido, copie-o ou abra o arquivo TXT salvo.</figcaption>
+          </figure>
+        </div>
+
+        <div class="window-mockup" hidden>
           <div class="window-header">
             <div class="window-controls">
               <div class="window-dot dot-close"></div>
@@ -1318,7 +1365,7 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Open Source & Git</span>
-          <h2 class="section-title">Ajude a Desenvolver o Transcritor Local</h2>
+          <h2 class="section-title">Downloads e comunidade</h2>
           <p class="section-desc">
             O projeto é mantido no <strong>GitHub</strong> sob licença aberta. Desenvolvedores, designers e entusiastas de privacidade são muito bem-vindos para contribuir!
           </p>
@@ -1334,11 +1381,11 @@
                   <polyline points="8 6 2 12 8 18"></polyline>
                 </svg>
               </div>
-              <h3>Repositório no GitHub</h3>
-              <p>Acesse o código-fonte original, clone o repositório, inspecione a lógica de transcrição e envie suas contribuições via Pull Request.</p>
+              <h3>Acompanhe o projeto</h3>
+              <p>Baixe a versão mais recente na seção de downloads ou acompanhe novidades e melhorias no GitHub.</p>
             </div>
             <div class="oss-card-action">
-              <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+              <a href="https://github.com/EmersonJSC/Anot-" target="_blank" rel="noopener noreferrer" class="btn-link-action">
                 Acessar o GitHub do Projeto &rarr;
               </a>
             </div>
@@ -1358,7 +1405,7 @@
               <p>Testou um formato novo ou pensou em um recurso útil? Abra uma Issue para discutirmos a evolução contínua da ferramenta.</p>
             </div>
             <div class="oss-card-action">
-              <a href="https://github.com/Emersonjsc/transcritor-local/issues" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+              <a href="https://github.com/EmersonJSC/Anot-/issues" target="_blank" rel="noopener noreferrer" class="btn-link-action">
                 Abrir uma Issue no Git &rarr;
               </a>
             </div>
@@ -1376,36 +1423,33 @@
               <p>Ao dar uma estrela no repositório, você aumenta a visibilidade do projeto e incentiva a criação de mais ferramentas voltadas à soberania de dados.</p>
             </div>
             <div class="oss-card-action">
-              <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+              <a href="https://github.com/EmersonJSC/Anot-" target="_blank" rel="noopener noreferrer" class="btn-link-action">
                 Dar uma Estrela no GitHub &rarr;
               </a>
             </div>
           </div>
         </div>
 
-        <!-- Terminal de como clonar e rodar o Git -->
+        <!-- Guia de uso dos executáveis -->
         <div class="terminal-box">
           <div class="terminal-header">
             <div class="terminal-dots">
               <span></span><span></span><span></span>
             </div>
-            <div style="font-size: 0.8rem; color: #94a3b8; font-family: var(--font-mono);">Guia Rápido: Como rodar a partir do Git</div>
+            <div style="font-size: 0.8rem; color: #94a3b8; font-family: var(--font-mono);">Guia Rápido: Comece pelo download</div>
             <div style="width: 40px;"></div>
           </div>
           <div class="terminal-body">
-            <p><span class="code-comment"># 1. Clone o repositório pelo Git</span></p>
-            <p><span class="code-cmd">git clone</span> https://github.com/Emersonjsc/transcritor-local.git</p>
-            <p><span class="code-cmd">cd</span> transcritor-local</p>
+            <p><span class="code-comment"># 1. Baixe o arquivo indicado para o seu sistema</span></p>
+            <p><span class="code-cmd">Windows</span> → arquivo .exe</p>
+            <p><span class="code-cmd">Linux</span> → arquivo .AppImage ou .tar.gz</p>
             <br>
-            <p><span class="code-comment"># 2. Crie e ative o ambiente virtual Python</span></p>
-            <p><span class="code-cmd">python3</span> -m venv .venv</p>
-            <p><span class="code-cmd">source</span> .venv/bin/activate  <span class="code-comment"># No Windows use: .venv\Scripts\activate</span></p>
+            <p><span class="code-comment"># 2. Abra o programa</span></p>
+            <p><span class="code-cmd">Windows</span> → dê dois cliques no .exe</p>
+            <p><span class="code-cmd">Linux</span> → marque o .AppImage como executável e abra-o</p>
             <br>
-            <p><span class="code-comment"># 3. Instale os pacotes necessários</span></p>
-            <p><span class="code-cmd">pip install</span> -r requirements.txt</p>
-            <br>
-            <p><span class="code-comment"># 4. Inicie o Transcritor</span></p>
-            <p><span class="code-cmd">python</span> main.py</p>
+            <p><span class="code-comment"># 3. Arraste seu áudio ou vídeo para o anotô</span></p>
+            <p>Pronto: a transcrição será salva automaticamente em texto.</p>
           </div>
         </div>
       </div>
@@ -1555,12 +1599,12 @@
 
           <div class="faq-item">
             <h4>É realmente grátis?</h4>
-            <p>Sim. O Transcritor Local é um software livre e de código aberto. Não possui versões pagas, assinaturas, anúncios ou limitações artificiais de minutos.</p>
+            <p>Sim. O anotô é um software livre e de código aberto. Não possui versões pagas, assinaturas, anúncios ou limitações artificiais de minutos.</p>
           </div>
 
           <div class="faq-item">
             <h4>Como ajudar a manter ou melhorar o projeto?</h4>
-            <p>Você pode acessar o repositório no <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" style="color:var(--accent);">GitHub</a>, abrir issues com ideias de melhorias, relatar bugs ou submeter códigos via Pull Request.</p>
+            <p>Você pode acessar o repositório no <a href="https://github.com/EmersonJSC/Anot-" target="_blank" style="color:var(--accent);">GitHub</a>, abrir issues com ideias de melhorias, relatar bugs ou enviar contribuições.</p>
           </div>
         </div>
       </div>
@@ -1571,13 +1615,13 @@
   <footer>
     <div class="container footer-inner">
       <div class="footer-text">
-        <strong>Transcritor Local</strong> — Transcrição offline, privada e de código aberto.
+        <strong>anotô</strong> — Transcrição offline, privada e de código aberto.
       </div>
 
       <ul class="footer-links">
-        <li><a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer">Código no Git</a></li>
-        <li><a href="https://github.com/Emersonjsc/transcritor-local/issues" target="_blank" rel="noopener noreferrer">Ajude no Git (Issues)</a></li>
-        <li><a href="https://github.com/Emersonjsc/transcritor-local/releases" target="_blank" rel="noopener noreferrer">Releases</a></li>
+        <li><a href="https://github.com/EmersonJSC/Anot-" target="_blank" rel="noopener noreferrer">Código no GitHub</a></li>
+        <li><a href="https://github.com/EmersonJSC/Anot-/issues" target="_blank" rel="noopener noreferrer">Ajude com uma Issue</a></li>
+        <li><a href="https://github.com/EmersonJSC/Anot-/releases" target="_blank" rel="noopener noreferrer">Todas as versões</a></li>
         <li><a href="#download">Download Windows / Linux</a></li>
       </ul>
     </div>
@@ -1599,7 +1643,8 @@
 
         const assets = release.assets;
         const windows = assets.find(asset => /\.exe$/i.test(asset.name));
-        const linux = assets.find(asset => /linux|\.appimage$|\.tar\.gz$/i.test(asset.name));
+        const linux = assets.find(asset => /\.appimage$/i.test(asset.name))
+          || assets.find(asset => /linux|\.tar\.gz$/i.test(asset.name));
         const links = { windows, linux };
 
         document.querySelectorAll('[data-platform]').forEach(link => {
