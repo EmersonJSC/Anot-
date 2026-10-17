@@ -36,7 +36,7 @@ class Sidebar(ctk.CTkFrame):
 
         ctk.CTkLabel(
             logo_frame,
-            text="Transcritor",
+            text="anotô",
             font=ctk.CTkFont(size=22, weight="bold"),
         ).pack(anchor="w")
 

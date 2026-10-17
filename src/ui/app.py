@@ -57,7 +57,7 @@ class TranscritorApp(ctk.CTk, TkinterDnD.DnDWrapper):
         ctk.set_default_color_theme("blue")
 
         # Configuração da janela
-        self.title("Transcritor")
+        self.title("anotô")
         self.geometry("960x700")
         self.minsize(820, 560)
 
@@ -101,7 +101,7 @@ class TranscritorApp(ctk.CTk, TkinterDnD.DnDWrapper):
         # Título simples
         ctk.CTkLabel(
             header,
-            text="🎙️ Transcritor",
+            text="🎙️ anotô",
             font=ctk.CTkFont(size=17, weight="bold"),
         ).grid(row=0, column=0, padx=20, pady=10, sticky="w")
 
@@ -152,7 +152,7 @@ class TranscritorApp(ctk.CTk, TkinterDnD.DnDWrapper):
 
         ctk.CTkLabel(
             self.welcome_frame,
-            text="Transcritor de Áudio e Vídeo",
+            text="anotô",
             font=ctk.CTkFont(size=20, weight="bold"),
         ).pack(pady=(6, 4))
 
