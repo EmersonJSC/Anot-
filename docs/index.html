@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transcritor Local — Transcrição de Áudio e Vídeo 100% Offline e Open Source</title>
+  <meta name="description" content="Transcreva arquivos de áudio e vídeo 100% offline no seu computador. Sem nuvem, sem servidores externos, sem vazamento de dados. Gratuito e Open Source para Windows e Linux.">
+  <meta name="keywords" content="transcrição offline, privacidade, whisper offline, transcritor local, sem internet, áudio para texto offline, open source">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Transcritor Local — Seus dados nunca saem da sua máquina">
+  <meta property="og:description" content="Transcrição de áudio e vídeo 100% offline, local e privada. Open source para Windows e Linux.">
+
+  <!-- Favicon SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z'/><path d='M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z'/></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --bg-card: #0f172a;
+      --bg-card-hover: #162036;
+      --border: #1e293b;
+      --border-accent: rgba(99, 102, 241, 0.3);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.25);
+      --accent: #38bdf8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --gradient-brand: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #38bdf8 100%);
+      --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bg-glow {
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.06) 40%, transparent 70%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header & Navegação */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(9, 13, 22, 0.88);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--gradient-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+
+    .brand-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn-github-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-github-nav:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 60px 0 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-badge-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge-offline {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+
+    .badge-oss {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #a5b4fc;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 4.8vw, 3.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+
+    .gradient-text {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 780px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    /* BOX DIDÁTICO DE PRIVACIDADE NO HERO */
+    .privacy-highlight-box {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      max-width: 780px;
+      margin: 0 auto 40px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+
+    .privacy-highlight-box svg {
+      width: 28px;
+      height: 28px;
+      fill: none;
+      stroke: #34d399;
+      flex-shrink: 0;
+    }
+
+    .privacy-highlight-box p {
+      font-size: 0.95rem;
+      color: #d1fae5;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* ÁREA CENTRAL DE DOWNLOAD NO MEIO */
+    .download-central-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 38px 30px;
+      max-width: 860px;
+      margin: 0 auto 55px;
+      box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.6), 0 0 25px var(--primary-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-central-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-brand);
+    }
+
+    .download-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .download-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 26px;
+    }
+
+    .download-buttons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 22px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      text-align: left;
+    }
+
+    .btn-download-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 10px 24px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-download-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(99, 102, 241, 0.55);
+      background: linear-gradient(135deg, #7175f3 0%, #5950ee 100%);
+    }
+
+    .btn-download-secondary {
+      background: #1e293b;
+      color: #ffffff;
+      border: 1px solid #334155;
+    }
+
+    .btn-download-secondary:hover {
+      background: #273549;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(56, 189, 248, 0.25);
+    }
+
+    .btn-icon-wrapper {
+      width: 46px;
+      height: 46px;
+      background: rgba(0, 0, 0, 0.28);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-icon-wrapper svg {
+      width: 26px;
+      height: 26px;
+      fill: currentColor;
+    }
+
+    .btn-text-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-main-text {
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .btn-sub-text {
+      font-size: 0.82rem;
+      opacity: 0.85;
+      margin-top: 3px;
+    }
+
+    .download-extra-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+
+    .download-extra-info a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .download-extra-info a:hover {
+      text-decoration: underline;
+    }
+
+    /* SEÇÃO EXPLICATIVA DIDÁTICA: COMO O OFFLINE FUNCIONA */
+    .section-offline-didactic {
+      padding: 70px 0;
+      background: rgba(15, 23, 42, 0.4);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .didactic-cards-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 40px;
+    }
+
+    .compare-card {
+      border-radius: var(--radius-md);
+      padding: 30px;
+      position: relative;
+      text-align: left;
+    }
+
+    .compare-card-cloud {
+      background: rgba(239, 68, 68, 0.04);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .compare-card-local {
+      background: rgba(16, 185, 129, 0.06);
+      border: 2px solid rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.1);
+    }
+
+    .compare-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .compare-badge {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .compare-badge-cloud {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    .compare-badge-local {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+    }
+
+    .compare-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .compare-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      list-style: none;
+    }
+
+    .compare-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.93rem;
+      line-height: 1.5;
+    }
+
+    .compare-icon-bad {
+      color: var(--accent-red);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .compare-icon-good {
+      color: var(--accent-green);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    /* Três Pilares Didáticos */
+    .privacy-pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+      margin-top: 45px;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: left;
+    }
+
+    .pillar-card-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .pillar-card h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .pillar-card p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Mockup da Interface do Programa */
+    .app-preview-wrap {
+      margin: 60px auto 30px;
+      max-width: 960px;
+    }
+
+    .window-mockup {
+      background: #111827;
+      border: 1px solid #2d3748;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      text-align: left;
+    }
+
+    .window-header {
+      background: #0d131f;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-close { background: #ef4444; }
+    .dot-min { background: #eab308; }
+    .dot-max { background: #22c55e; }
+
+    .window-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .window-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      background: #0d121f;
+    }
+
+    .mockup-dropzone {
+      border: 2px dashed rgba(99, 102, 241, 0.4);
+      border-radius: 12px;
+      background: rgba(30, 27, 75, 0.25);
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .dropzone-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 10px;
+      color: var(--primary);
+    }
+
+    .mockup-dropzone h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .mockup-dropzone p {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .mockup-chat-area {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-bubble-user {
+      align-self: flex-end;
+      background: #1e1b4b;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 12px 16px;
+      border-radius: 12px 12px 2px 12px;
+      max-width: 80%;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-bubble-user .file-badge {
+      background: var(--primary);
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .chat-bubble-bot {
+      align-self: flex-start;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 16px 18px;
+      border-radius: 12px 12px 12px 2px;
+      max-width: 90%;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .chat-bubble-bot .transcription-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-size: 0.8rem;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .chat-bubble-bot .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+
+    .mockup-footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid #1e293b;
+      padding-top: 14px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .model-selector-pill {
+      background: #1e293b;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      color: var(--text-muted);
+    }
+
+    /* Seção Open Source e GitHub */
+    .section-oss {
+      padding: 75px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 45px;
+    }
+
+    .section-tag {
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .oss-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .oss-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      text-align: left;
+    }
+
+    .oss-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .oss-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      color: var(--primary);
+    }
+
+    .oss-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .oss-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .oss-card-action {
+      margin-top: auto;
+    }
+
+    .btn-link-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: gap 0.2s ease;
+    }
+
+    .btn-link-action:hover {
+      gap: 12px;
+      color: #7dd3fc;
+    }
+
+    .terminal-box {
+      background: #080c14;
+      border: 1px solid #1e293b;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      max-width: 820px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
+    .terminal-header {
+      background: #0d121c;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #1a2333;
+    }
+
+    .terminal-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .terminal-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #334155;
+    }
+
+    .terminal-body {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-comment { color: #64748b; }
+    .code-cmd { color: #38bdf8; font-weight: 600; }
+
+    /* Features Grid */
+    .section-features {
+      padding: 80px 0;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--gradient-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Modelos Table */
+    .section-models {
+      padding: 80px 0;
+      background: rgba(15, 23, 42, 0.3);
+      border-top: 1px solid var(--border);
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: #131b2e;
+      padding: 16px 20px;
+      font-weight: 600;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 20px;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.6);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(99, 102, 241, 0.04);
+      color: var(--text);
+    }
+
+    .model-badge-rec {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid var(--primary);
+      color: #c7d2fe;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+
+    /* FAQ */
+    .section-faq {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      text-align: left;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+
+    .faq-item h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .faq-item p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      background: #060910;
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      margin-top: auto;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .footer-text {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text);
+    }
+
+    @media (max-width: 820px) {
+      .didactic-cards-wrap {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .download-buttons-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding: 45px 0 25px;
+      }
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <!-- Cabeçalho / Navbar -->
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+            <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+          </svg>
+        </div>
+        <span>Transcritor Local</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#download">Download</a></li>
+        <li><a href="#privacidade-didatica">100% Offline</a></li>
+        <li><a href="#como-funciona">Interface</a></li>
+        <li><a href="#modelos">Modelos</a></li>
+        <li><a href="#contribuir">Contribuir</a></li>
+        <li><a href="#faq">Dúvidas</a></li>
+      </ul>
+
+      <!-- Link do Git em destaque no header -->
+      <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-github-nav" title="Ver código no GitHub">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+        <span>GitHub ⭐</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="container">
+        <!-- Badges -->
+        <div class="hero-badge-wrap">
+          <span class="badge badge-offline">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            100% Offline & Privado
+          </span>
+          <span class="badge badge-oss">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Código Aberto (Open Source)
+          </span>
+        </div>
+
+        <!-- Título Principal -->
+        <h1>
+          Transcreva áudio e vídeo<br>
+          <span class="gradient-text">sem enviar um único byte para a nuvem</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Seus arquivos confidenciais são processados <strong>exclusivamente dentro do seu computador</strong>. Sem servidores externos, sem assinaturas mensais e com total respeito à sua privacidade.
+        </p>
+
+        <!-- Aviso Didático em Destaque -->
+        <div class="privacy-highlight-box">
+          <svg viewBox="0 0 24 24" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <p>
+            <strong>Privacidade Absoluta Garantida:</strong> Todo o processamento de Inteligência Artificial ocorre no seu próprio processador (CPU) ou placa de vídeo (GPU). O aplicativo funciona perfeitamente até mesmo se você desconectar a internet do seu PC.
+          </p>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- NO MEIO: CARTÃO CENTRAL DE DOWNLOAD WINDOWS / LINUX -->
+        <!-- ============================================== -->
+        <div class="download-central-card" id="download">
+          <h2 class="download-title">Baixe Gratuitamente</h2>
+          <p class="download-desc">Escolha seu sistema operacional. O programa é livre de anúncios, rastreadores e taxas.</p>
+
+          <div class="download-buttons-grid">
+            <!-- Botão Windows -->
+            <a href="https://github.com/Emersonjsc/transcritor-local/releases/latest" target="_blank" rel="noopener noreferrer" class="btn-download btn-download-primary">
+              <div class="btn-icon-wrapper">
+                <!-- Ícone Windows -->
+                <svg viewBox="0 0 24 24">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+              </div>
+              <div class="btn-text-group">
+                <span class="btn-main-text">Baixar para Windows</span>
+                <span class="btn-sub-text">Versão 64-bit (.exe portátil / instalador)</span>
+              </div>
+            </a>
+
+            <!-- Botão Linux -->
+            <a href="https://github.com/Emersonjsc/transcritor-local/releases/latest" target="_blank" rel="noopener noreferrer" class="btn-download btn-download-secondary">
+              <div class="btn-icon-wrapper">
+                <!-- Ícone Linux -->
+                <svg viewBox="0 0 24 24">
+                  <path d="M12.001 2c-2.484 0-4.5 2.016-4.5 4.5 0 .762.19 1.48.525 2.11-.83.61-1.375 1.58-1.375 2.69 0 .84.314 1.61.834 2.2-.423.75-.684 1.61-.684 2.5 0 2.28 1.488 4.2 3.5 4.8.44.13.91.2 1.4.2.49 0 .96-.07 1.4-.2 2.012-.6 3.5-2.52 3.5-4.8 0-.89-.261-1.75-.684-2.5.52-.59.834-1.36.834-2.2 0-1.11-.545-2.08-1.375-2.69.335-.63.525-1.348.525-2.11 0-2.484-2.016-4.5-4.5-4.5z"/>
+                </svg>
+              </div>
+              <div class="btn-text-group">
+                <span class="btn-main-text">Baixar para Linux</span>
+                <span class="btn-sub-text">Compatível com Ubuntu, Debian, Fedora, Arch</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Links de código-fonte e releases -->
+          <div class="download-extra-info">
+            <span>💻 100% Gratuito & Open Source</span>
+            <span>•</span>
+            <a href="#contribuir">Como rodar pelo código-fonte no Git</a>
+            <span>•</span>
+            <a href="https://github.com/Emersonjsc/transcritor-local/releases" target="_blank" rel="noopener noreferrer">Ver todas as versões no GitHub &rarr;</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SEÇÃO DIDÁTICA: O QUE SIGNIFICA FUNCIONAR OFFLINE? -->
+    <!-- ============================================== -->
+    <section class="section-offline-didactic" id="privacidade-didatica">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Explicação Didática</span>
+          <h2 class="section-title">O que realmente significa ser 100% Offline?</h2>
+          <p class="section-desc">
+            A maioria dos serviços de transcrição envia o que você fala para servidores nos Estados Unidos ou Europa. Com o Transcritor Local, isso <strong>nunca</strong> acontece.
+          </p>
+        </div>
+
+        <!-- Comparativo visual didático -->
+        <div class="didactic-cards-wrap">
+          <!-- Card Nuvem (Outros) -->
+          <div class="compare-card compare-card-cloud">
+            <div class="compare-header">
+              <span class="compare-badge compare-badge-cloud">Como a maioria faz</span>
+              <h3 class="compare-title">Serviços Comuns na Nuvem</h3>
+            </div>
+            <ul class="compare-steps">
+              <li class="compare-step-item">
+                <span class="compare-icon-bad">✕</span>
+                <span>Seu áudio confidencial é enviado pela internet para servidores desconhecidos.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-bad">✕</span>
+                <span>Suas conversas podem ser armazenadas, lidas por terceiros ou usadas para treinar novos modelos.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-bad">✕</span>
+                <span>Se sua internet cair ou estiver lenta, a transcrição para de funcionar.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-bad">✕</span>
+                <span>Cobrança por minuto gravado ou mensalidades caras após limite curto.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Card Transcritor Local -->
+          <div class="compare-card compare-card-local">
+            <div class="compare-header">
+              <span class="compare-badge compare-badge-local">Com o Transcritor Local</span>
+              <h3 class="compare-title">100% Local no seu Computador</h3>
+            </div>
+            <ul class="compare-steps">
+              <li class="compare-step-item">
+                <span class="compare-icon-good">✓</span>
+                <span><strong>Zero saída de dados:</strong> O áudio nunca sai do seu disco rígido ou memória RAM.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-good">✓</span>
+                <span><strong>Sem servidores externos:</strong> A Inteligência Artificial roda na sua máquina como uma calculadora local.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-good">✓</span>
+                <span><strong>Funciona no modo avião:</strong> Transcreva em voos, locais remotos ou redes fechadas sem internet.</span>
+              </li>
+              <li class="compare-step-item">
+                <span class="compare-icon-good">✓</span>
+                <span><strong>Ilimitado e grátis:</strong> Transcreva 1 minuto ou 100 horas sem pagar nada por isso.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 3 Pilares da Privacidade Didática -->
+        <div class="privacy-pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-card-icon">🩺</div>
+            <h4>Sigilo Médico & Advocacia</h4>
+            <p>Ideal para consultas, audiências, depoimentos e relatórios com dados de pacientes ou clientes protegidos por lei (LGPD / sigilo profissional).</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-card-icon">🏢</div>
+            <h4>Empresas & Startups</h4>
+            <p>Reuniões de diretoria, planejamento financeiro e gravações estratégicas mantidas a sete chaves dentro do patrimônio da empresa.</p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-card-icon">🔍</div>
+            <h4>Código Aberto Auditável</h4>
+            <p>Não precisa acreditar em promessas comerciais. Qualquer programador pode inspecionar o código-fonte no Git e comprovar a ausência de telemetria.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- MOCKUP VISUAL DO PROGRAMA (COMO ELE SE PARECE) -->
+    <!-- ============================================== -->
+    <section class="container" id="como-funciona">
+      <div class="app-preview-wrap">
+        <div class="section-header" style="margin-bottom: 30px;">
+          <span class="section-tag">Interface do Aplicativo</span>
+          <h2 class="section-title">O Conceito de "Chat Silencioso"</h2>
+          <p class="section-desc">Interface limpa, sem menus poluídos. Você apenas solta o arquivo e lê o resultado.</p>
+        </div>
+
+        <div class="window-mockup">
+          <div class="window-header">
+            <div class="window-controls">
+              <div class="window-dot dot-close"></div>
+              <div class="window-dot dot-min"></div>
+              <div class="window-dot dot-max"></div>
+            </div>
+            <div class="window-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#6366f1"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/></svg>
+              Transcritor — Interface Nativa
+            </div>
+            <div style="width: 40px;"></div>
+          </div>
+
+          <div class="window-body">
+            <!-- Zona de Drop -->
+            <div class="mockup-dropzone">
+              <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <h4>Arraste e solte seu arquivo de áudio ou vídeo aqui</h4>
+              <p>Compatível com MP3, WAV, FLAC, M4A, OGG, MP4, MKV, AVI, MOV, WebM</p>
+            </div>
+
+            <!-- Fluxo de Chat -->
+            <div class="mockup-chat-area">
+              <div class="chat-bubble-user">
+                <span class="file-badge">AUDIO</span>
+                <span>entrevista_pesquisa_2026.mp3 (38 MB)</span>
+              </div>
+
+              <div class="chat-bubble-bot">
+                <div class="transcription-status">
+                  <span class="pulse-dot"></span>
+                  <span>Transcrição concluída 100% offline via faster-whisper • Arquivo gerado em /output/entrevista_pesquisa_2026.txt</span>
+                </div>
+                <p>
+                  "Olá a todos! Iniciamos nossa sessão de coleta de dados. Como reforçamos anteriormente, todos os depoimentos colhidos aqui permanecerão estritamente confidenciais. A transcrição está rodando localmente sem envio a servidores terceirizados..."
+                </p>
+              </div>
+            </div>
+
+            <!-- Rodapé da Janela -->
+            <div class="mockup-footer-bar">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <span>Modelo Selecionado:</span>
+                <span class="model-selector-pill">⚡ small (244M) — CTranslate2 INT8</span>
+              </div>
+              <div>Processamento: 100% Local (CPU/GPU)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- SEÇÃO: AJUDE NO DESENVOLVIMENTO (GIT / OPEN SOURCE) -->
+    <!-- ============================================== -->
+    <section class="section-oss" id="contribuir">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Open Source & Git</span>
+          <h2 class="section-title">Ajude a Desenvolver o Transcritor Local</h2>
+          <p class="section-desc">
+            O projeto é mantido no <strong>GitHub</strong> sob licença aberta. Desenvolvedores, designers e entusiastas de privacidade são muito bem-vindos para contribuir!
+          </p>
+        </div>
+
+        <div class="oss-cards-grid">
+          <!-- Card Repositório Git -->
+          <div class="oss-card">
+            <div>
+              <div class="oss-card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <h3>Repositório no GitHub</h3>
+              <p>Acesse o código-fonte original, clone o repositório, inspecione a lógica de transcrição e envie suas contribuições via Pull Request.</p>
+            </div>
+            <div class="oss-card-action">
+              <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+                Acessar o GitHub do Projeto &rarr;
+              </a>
+            </div>
+          </div>
+
+          <!-- Card Issues / Bugs / Sugestões -->
+          <div class="oss-card">
+            <div>
+              <div class="oss-card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <h3>Reporte Bugs & Sugira Recursos</h3>
+              <p>Testou um formato novo ou pensou em um recurso útil? Abra uma Issue para discutirmos a evolução contínua da ferramenta.</p>
+            </div>
+            <div class="oss-card-action">
+              <a href="https://github.com/Emersonjsc/transcritor-local/issues" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+                Abrir uma Issue no Git &rarr;
+              </a>
+            </div>
+          </div>
+
+          <!-- Card Apoiar com Estrela -->
+          <div class="oss-card">
+            <div>
+              <div class="oss-card-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+              </div>
+              <h3>Apoie com uma Estrela (Star)</h3>
+              <p>Ao dar uma estrela no repositório, você aumenta a visibilidade do projeto e incentiva a criação de mais ferramentas voltadas à soberania de dados.</p>
+            </div>
+            <div class="oss-card-action">
+              <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer" class="btn-link-action">
+                Dar uma Estrela no GitHub &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terminal de como clonar e rodar o Git -->
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <div class="terminal-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div style="font-size: 0.8rem; color: #94a3b8; font-family: var(--font-mono);">Guia Rápido: Como rodar a partir do Git</div>
+            <div style="width: 40px;"></div>
+          </div>
+          <div class="terminal-body">
+            <p><span class="code-comment"># 1. Clone o repositório pelo Git</span></p>
+            <p><span class="code-cmd">git clone</span> https://github.com/Emersonjsc/transcritor-local.git</p>
+            <p><span class="code-cmd">cd</span> transcritor-local</p>
+            <br>
+            <p><span class="code-comment"># 2. Crie e ative o ambiente virtual Python</span></p>
+            <p><span class="code-cmd">python3</span> -m venv .venv</p>
+            <p><span class="code-cmd">source</span> .venv/bin/activate  <span class="code-comment"># No Windows use: .venv\Scripts\activate</span></p>
+            <br>
+            <p><span class="code-comment"># 3. Instale os pacotes necessários</span></p>
+            <p><span class="code-cmd">pip install</span> -r requirements.txt</p>
+            <br>
+            <p><span class="code-comment"># 4. Inicie o Transcritor</span></p>
+            <p><span class="code-cmd">python</span> main.py</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RECURSOS E DIFERENCIAIS -->
+    <section class="section-features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Recursos Técnicos</span>
+          <h2 class="section-title">Feito com tecnologia de ponta</h2>
+          <p class="section-desc">Arquitetura focada em baixo consumo de memória e máxima velocidade.</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>faster-whisper (CTranslate2)</h3>
+            <p>Utiliza a biblioteca mais eficiente de inferência Whisper do mundo. Até 4x mais veloz que a biblioteca oficial e consome a metade da memória RAM.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Zero Telemetria</h3>
+            <p>Nenhum dado analítico, nenhum relatório de uso e nenhuma requisição de rastreamento é enviada para fora do seu sistema.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎬</div>
+            <h3>Áudio e Vídeo Integrados</h3>
+            <p>O app extrai o áudio automaticamente de arquivos de vídeo pesados (como MP4 ou MKV) e transcreve sem que você precise converter antes.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>Salvamento Automático em .TXT</h3>
+            <p>O texto transcrito é imediatamente gravado em disco no diretório de saída com o nome original do arquivo. Sem risco de perder o trabalho.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚙️</div>
+            <h3>Quantização INT8</h3>
+            <p>Permite que modelos de altíssima precisão rodem de forma surpreendentemente ágil em processadores domésticos sem superaquecer a máquina.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎮</div>
+            <h3>Aceleração por GPU NVIDIA</h3>
+            <p>Se o seu computador tiver uma placa NVIDIA compatível com CUDA, o app aproveita toda a potência da placa gráfica para transcrever quase instantaneamente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABELA DE MODELOS -->
+    <section class="section-models" id="modelos">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Flexibilidade</span>
+          <h2 class="section-title">Qual modelo Whisper escolher?</h2>
+          <p class="section-desc">Todos os modelos rodam 100% offline após o download automático inicial.</p>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Modelo</th>
+                <th>Parâmetros</th>
+                <th>Tamanho em Disco</th>
+                <th>RAM Mínima</th>
+                <th>Velocidade</th>
+                <th>Precisão</th>
+                <th>Quando usar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>tiny</strong></td>
+                <td>39M</td>
+                <td>~75 MB</td>
+                <td>~1 GB</td>
+                <td>⚡⚡⚡⚡⚡</td>
+                <td>⭐⭐</td>
+                <td>Testes rápidos e rascunhos em computadores antigos</td>
+              </tr>
+              <tr>
+                <td><strong>base</strong></td>
+                <td>74M</td>
+                <td>~142 MB</td>
+                <td>~1 GB</td>
+                <td>⚡⚡⚡⚡</td>
+                <td>⭐⭐⭐</td>
+                <td>Áudios curtos e com locutor nítido</td>
+              </tr>
+              <tr>
+                <td><strong>small</strong> <span class="model-badge-rec">Recomendado para todos</span></td>
+                <td>244M</td>
+                <td>~466 MB</td>
+                <td>~2 GB</td>
+                <td>⚡⚡⚡</td>
+                <td>⭐⭐⭐⭐</td>
+                <td><strong>Melhor escolha geral</strong> (ótima precisão em português e leve)</td>
+              </tr>
+              <tr>
+                <td><strong>medium</strong></td>
+                <td>769M</td>
+                <td>~1.5 GB</td>
+                <td>~5 GB</td>
+                <td>⚡⚡</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Entrevistas longas, sotaques ou ruído de fundo moderado</td>
+              </tr>
+              <tr>
+                <td><strong>large-v3-turbo</strong> <span class="model-badge-rec">Alta Precisão</span></td>
+                <td>809M</td>
+                <td>~1.6 GB</td>
+                <td>~6 GB</td>
+                <td>⚡⚡⚡</td>
+                <td>⭐⭐⭐⭐⭐</td>
+                <td>Máxima fidelidade com excelente custo-benefício para quem tem GPU</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section-faq" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Dúvidas Frequentes</span>
+          <h2 class="section-title">Perguntas Comuns</h2>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-item">
+            <h4>O programa precisa de internet em algum momento?</h4>
+            <p>Apenas uma única vez quando você escolhe um modelo novo para que ele seja baixado para a sua máquina (ficando na pasta <code>models/</code>). A partir daí, você pode desconectar a internet permanentemente se desejar.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Alguém pode escutar o que estou transcrevendo?</h4>
+            <p>Absolutamente ninguém. O processamento é todo local. Não existe nenhum servidor intermediário, conta de usuário ou transmissão externa de dados.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>É realmente grátis?</h4>
+            <p>Sim. O Transcritor Local é um software livre e de código aberto. Não possui versões pagas, assinaturas, anúncios ou limitações artificiais de minutos.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Como ajudar a manter ou melhorar o projeto?</h4>
+            <p>Você pode acessar o repositório no <a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" style="color:var(--accent);">GitHub</a>, abrir issues com ideias de melhorias, relatar bugs ou submeter códigos via Pull Request.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Rodapé -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-text">
+        <strong>Transcritor Local</strong> — Transcrição offline, privada e de código aberto.
+      </div>
+
+      <ul class="footer-links">
+        <li><a href="https://github.com/Emersonjsc/transcritor-local" target="_blank" rel="noopener noreferrer">Código no Git</a></li>
+        <li><a href="https://github.com/Emersonjsc/transcritor-local/issues" target="_blank" rel="noopener noreferrer">Ajude no Git (Issues)</a></li>
+        <li><a href="https://github.com/Emersonjsc/transcritor-local/releases" target="_blank" rel="noopener noreferrer">Releases</a></li>
+        <li><a href="#download">Download Windows / Linux</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

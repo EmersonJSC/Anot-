@@ -1,0 +1,1 @@
+# Transcritor Local - Módulo principal
