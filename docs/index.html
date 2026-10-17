@@ -340,6 +340,24 @@
       box-shadow: 0 10px 22px rgba(56, 189, 248, 0.25);
     }
 
+    .linux-download-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .linux-alt-download {
+      align-self: center;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      text-decoration: none;
+    }
+
+    .linux-alt-download:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
     .btn-icon-wrapper {
       width: 46px;
       height: 46px;
@@ -1160,19 +1178,22 @@
               </div>
             </a>
 
-            <!-- Botão Linux -->
-            <a href="https://github.com/EmersonJSC/Anot-/releases" target="_blank" rel="noopener noreferrer" class="btn-download btn-download-secondary" data-platform="linux">
-              <div class="btn-icon-wrapper">
-                <!-- Ícone Linux -->
-                <svg viewBox="0 0 24 24">
-                  <path d="M12.001 2c-2.484 0-4.5 2.016-4.5 4.5 0 .762.19 1.48.525 2.11-.83.61-1.375 1.58-1.375 2.69 0 .84.314 1.61.834 2.2-.423.75-.684 1.61-.684 2.5 0 2.28 1.488 4.2 3.5 4.8.44.13.91.2 1.4.2.49 0 .96-.07 1.4-.2 2.012-.6 3.5-2.52 3.5-4.8 0-.89-.261-1.75-.684-2.5.52-.59.834-1.36.834-2.2 0-1.11-.545-2.08-1.375-2.69.335-.63.525-1.348.525-2.11 0-2.484-2.016-4.5-4.5-4.5z"/>
-                </svg>
-              </div>
-              <div class="btn-text-group">
-                <span class="btn-main-text">Baixar AppImage para Linux</span>
-                <span class="btn-sub-text">AppImage (recomendado) • .tar.gz disponível</span>
-              </div>
-            </a>
+            <!-- Downloads Linux -->
+            <div class="linux-download-group">
+              <a href="https://github.com/EmersonJSC/Anot-/releases" target="_blank" rel="noopener noreferrer" class="btn-download btn-download-secondary" data-platform="linux-appimage">
+                <div class="btn-icon-wrapper">
+                  <!-- Ícone Linux -->
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12.001 2c-2.484 0-4.5 2.016-4.5 4.5 0 .762.19 1.48.525 2.11-.83.61-1.375 1.58-1.375 2.69 0 .84.314 1.61.834 2.2-.423.75-.684 1.61-.684 2.5 0 2.28 1.488 4.2 3.5 4.8.44.13.91.2 1.4.2.49 0 .96-.07 1.4-.2 2.012-.6 3.5-2.52 3.5-4.8 0-.89-.261-1.75-.684-2.5.52-.59.834-1.36.834-2.2 0-1.11-.545-2.08-1.375-2.69.335-.63.525-1.348.525-2.11 0-2.484-2.016-4.5-4.5-4.5z"/>
+                  </svg>
+                </div>
+                <div class="btn-text-group">
+                  <span class="btn-main-text">Baixar AppImage para Linux</span>
+                  <span class="btn-sub-text">Recomendado: funciona na maioria das distribuições</span>
+                </div>
+              </a>
+              <a href="https://github.com/EmersonJSC/Anot-/releases" target="_blank" rel="noopener noreferrer" class="linux-alt-download" data-platform="linux-tar">Prefere extrair manualmente? Baixar pacote .tar.gz</a>
+            </div>
           </div>
 
           <!-- Links de código-fonte e releases -->
@@ -1291,13 +1312,9 @@
         </div>
 
         <div class="app-screenshots">
-          <figure class="app-screenshot">
-            <img src="assets/anoto-tela-inicial.png" alt="Tela inicial do anotô com área para arrastar um arquivo de áudio ou vídeo">
-            <figcaption>Arraste um áudio ou vídeo, ou selecione o arquivo pelo botão.</figcaption>
-          </figure>
-          <figure class="app-screenshot">
-            <img src="assets/anoto-transcricao-concluida.png" alt="Tela do anotô mostrando uma transcrição concluída em português">
-            <figcaption>Veja o texto reconhecido, copie-o ou abra o arquivo TXT salvo.</figcaption>
+          <figure class="app-screenshot" style="grid-column: 1 / -1;">
+            <img src="assets/anoto-interface-v1.1.0.png" alt="Interface do anotô v1.1.0 com navegação lateral, conversa e editor integrado">
+            <figcaption>Envie um arquivo, acompanhe o resultado e abra a transcrição no editor integrado.</figcaption>
           </figure>
         </div>
 
@@ -1643,9 +1660,9 @@
 
         const assets = release.assets;
         const windows = assets.find(asset => /\.exe$/i.test(asset.name));
-        const linux = assets.find(asset => /\.appimage$/i.test(asset.name))
-          || assets.find(asset => /linux|\.tar\.gz$/i.test(asset.name));
-        const links = { windows, linux };
+        const linuxAppImage = assets.find(asset => /\.appimage$/i.test(asset.name));
+        const linuxTar = assets.find(asset => /\.tar\.gz$/i.test(asset.name));
+        const links = { windows, "linux-appimage": linuxAppImage, "linux-tar": linuxTar };
 
         document.querySelectorAll('[data-platform]').forEach(link => {
           const asset = links[link.dataset.platform];
